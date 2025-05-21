@@ -39,7 +39,7 @@ public class BreweryController {
 
         if(hasParameter) url.append("&");
 
-        url.append("resultsPerPage=").append(resultsPerPage);
+        url.append("per_page=").append(resultsPerPage);
 
         Response response;
         try {
