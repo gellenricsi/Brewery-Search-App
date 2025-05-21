@@ -16,8 +16,13 @@ public class BreweryController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String type,
             @RequestParam(required = false, defaultValue = "10") int resultsPerPage,
-            @RequestParam String id
+            @RequestParam(required = false) String id
     ) {
+
+        if(id == null || id.isEmpty()) {
+            return ResponseEntity.status(400).body("ID hiányzik az URL-ből.");
+        }
+
         StringBuilder url = new StringBuilder("https://api.openbrewerydb.org/v1/breweries?");
         boolean hasParameter = false;
 
@@ -36,7 +41,12 @@ public class BreweryController {
 
         url.append("resultsPerPage=").append(resultsPerPage);
 
-        Response response = given().get(url.toString());
+        Response response;
+        try {
+            response = given().get(url.toString());
+        }catch (Exception e) {
+            return ResponseEntity.status(500).body("Hiba történt a külső API hívásakor.");
+        }
 
         boolean found = response.jsonPath().getList("id", String.class).contains(id);
 
@@ -57,7 +67,7 @@ public class BreweryController {
         }
 
         if(found) {
-            return ResponseEntity.status(201).body(result.toString());
+            return ResponseEntity.status(200).body(result.toString());
         } else {
             return ResponseEntity.status(404).body(result.toString());
         }
